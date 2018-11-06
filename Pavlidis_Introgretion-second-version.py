@@ -142,6 +142,10 @@ chrom=1
 for j in dd:
     introgressed=[]
     trueintrogressed=[]
+    leftchunks=[]
+    rightchunks=[]
+    who=[]
+    when=[]
     for tree in j.trees():    
         
         #print(tree.draw(format="unicode"))
@@ -156,6 +160,11 @@ for j in dd:
         for i in j.migrations():
             
             if i.source==4 and i.dest==1:
+                if ( str(i.left) not in leftchunks ) and ( str(i.right) not in rightchunks ):
+                    leftchunks.append(str(i.left))
+                    rightchunks.append(str(i.right))
+                    who.append(str(i.node))
+                    when.append(str(i.time))
                 if int(i.node) not in introgressed:
                     introgressed.append(int(i.node))
                     events+=1
@@ -188,6 +197,8 @@ for j in dd:
     numberoftrees=j.num_trees
     print('modern introgressed nodes: ',trueintrogressedfinal)
     print('#######################','\n')
-
+    for r in range(0,len(leftchunks)):
+        print('From {} to {} was an introgression of the individual {} at time = {}'.format(leftchunks[r],rightchunks[r],who[r],when[r]))
+    print('The total naumber of introgressed segments is {}'.format(len(leftchunks)))
 print(events/n_replicates)
 
