@@ -1,7 +1,7 @@
 import msprime
 import numpy as np
 import math
-
+import random as random
 
 
 
@@ -95,8 +95,8 @@ msprime.MigrationRateChange(time=T_introgration1,rate=0.02, matrix_index=(4, 1))
 
 #End of Introgration
 
-msprime.MigrationRateChange(time=T_introgration1+1,rate=0, matrix_index=(1, 4)),
-msprime.MigrationRateChange(time=T_introgration1+1,rate=0, matrix_index=(4, 1)),
+msprime.MigrationRateChange(time=T_introgration1+5,rate=0, matrix_index=(1, 4)),
+msprime.MigrationRateChange(time=T_introgration1+5,rate=0, matrix_index=(4, 1)),
 
 
 
@@ -129,14 +129,15 @@ chrom=1
 
 #recomb_map=msprime.RecombinationMap.read_hapmap('genetic_map_GRCh37_chr{}.txt'.format(chrom))
 
-n_replicates=1
+n_replicates=10
+random_seed=random.randint(0,100000)
 
 dd = msprime.simulate(samples=samples,
     population_configurations=population_configurations,
     migration_matrix=migration_matrix,mutation_rate=1e-8,
-    demographic_events=demographic_events,record_migrations=True,length=1000000,recombination_rate=2e-8 ,num_replicates=n_replicates,random_seed=10)
+    demographic_events=demographic_events,record_migrations=True,length=1000000,random_seed=random_seed,recombination_rate=2e-8 ,num_replicates=n_replicates)
 #recombination_map=recomb_map
-    
+
 events=0
 chrom=1
 for j in dd:
@@ -146,42 +147,29 @@ for j in dd:
     rightchunks=[]
     who=[]
     when=[]
-    for tree in j.trees():    
+    
+    for i in j.migrations():
         
+        if i.source==4 and i.dest==1:
+            if ( str(i.left) not in leftchunks ) and ( str(i.right) not in rightchunks ):
+                leftchunks.append(str(i.left))
+                rightchunks.append(str(i.right))
+                who.append(str(i.node))
+                when.append(str(i.time))
+            if int(i.node) not in introgressed:
+                introgressed.append(int(i.node))
+                events+=1
+                #break
+    for tree in j.trees():
         #print(tree.draw(format="unicode"))
-        
-        
-        
-        
-        
-        
-        
-        
-        for i in j.migrations():
-            
-            if i.source==4 and i.dest==1:
-                if ( str(i.left) not in leftchunks ) and ( str(i.right) not in rightchunks ):
-                    leftchunks.append(str(i.left))
-                    rightchunks.append(str(i.right))
-                    who.append(str(i.node))
-                    when.append(str(i.time))
-                if int(i.node) not in introgressed:
-                    introgressed.append(int(i.node))
-                    events+=1
-                    #break
-        
-        
-        
-        
-        
-        for i in introgressed:
-            if tree.is_leaf(i)!=True:
-                for my in tree.get_leaves(i):
+        for k in introgressed:
+            if tree.is_leaf(k)!=True:
+                for my in tree.get_leaves(k):
                     if int(my) not in trueintrogressed:
                         trueintrogressed.append(int(my))
             else:
-                if int(i) not in trueintrogressed:
-                    trueintrogressed.append(int(i))
+                if int(k) not in trueintrogressed:
+                    trueintrogressed.append(int(k))
                 
                 
                 
