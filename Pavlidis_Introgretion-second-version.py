@@ -127,7 +127,7 @@ msprime.MassMigration(time=T_split_SAPIENS_NEAD_DENI,source=3,destination=0,prop
 
 chrom=1
 
-recomb_map=msprime.RecombinationMap.read_hapmap('genetic_map_GRCh37_chr{}.txt'.format(chrom))
+#recomb_map=msprime.RecombinationMap.read_hapmap('genetic_map_GRCh37_chr{}.txt'.format(chrom))
 
 n_replicates=1
 
