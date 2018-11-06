@@ -1,7 +1,7 @@
 import msprime
 import numpy as np
 import math
-
+import random as random
 
 
 
@@ -14,7 +14,17 @@ N_OUT_OF_AFRICA=500
 N_EU0=250
 N_ASIA0=250
 
+
+
+
+
+
+#bottleneck
+
+
+
 r_EU=0.004
+
 r_ASIA=0.004
 r_AFRICA=0.001
 
@@ -38,7 +48,7 @@ N_AFRICA=N_OG_SAPIENS / math.exp(-r_AFRICA * T_split_AFRICA_OUTOFAFRICA)
 N_EU=N_EU0 / math.exp(-r_EU * T_split_EU_ASIA)
 N_ASIA=N_ASIA0 / math.exp(-r_ASIA * T_split_EU_ASIA)
 
-n_replicates=1000
+
 
 
 population_configurations = [
@@ -52,7 +62,7 @@ population_configurations = [
 
 #migrations
 m_=0.00001
-
+#m_T1=131
 
 
 
@@ -66,7 +76,8 @@ migration_matrix = [
     [0,0,0,0.001,0.01,0]
 ]
 
-samples=[msprime.Sample(0,T_archaic_sampling)]*2 + [msprime.Sample(1,T_archaic_sampling)]*2 + [msprime.Sample(2,T_archaic_sampling)] *2 + [msprime.Sample(3,0)] *2 + [msprime.Sample(4,0)] *2 + [msprime.Sample(5,0)] *2
+
+samples=[msprime.Sample(0,T_archaic_sampling)]*6 + [msprime.Sample(1,T_archaic_sampling)]*6 + [msprime.Sample(2,T_archaic_sampling)] *6 + [msprime.Sample(3,0)] *6 + [msprime.Sample(4,0)] *6 + [msprime.Sample(5,0)] *6
 
 
 demographic_events = [
@@ -83,7 +94,7 @@ msprime.MigrationRateChange(time=T_split_EU_ASIA,rate=0),
 ########################################################################################
 #Introgration
 
-msprime.MassMigration(time=T_introgration1,source=4,destination=1,proportion = 0.2),
+msprime.MassMigration(time=T_introgration1,source=4,destination=1,proportion = 0.02),
 
 ########################################################################################
 #Split Africa-Eurasian, population 3 size set to homo sapiens
@@ -109,18 +120,69 @@ msprime.MassMigration(time=T_split_SAPIENS_NEAD_DENI,source=3,destination=0,prop
 
 ]
 
+chrom=1
+
+#recomb_map=msprime.RecombinationMap.read_hapmap('genetic_map_GRCh37_chr{}.txt'.format(chrom))
+
+n_replicates=1000
+random_seed=random.randint(0,100000)
+
 dd = msprime.simulate(samples=samples,
     population_configurations=population_configurations,
-    migration_matrix=migration_matrix,mutation_rate=1.25e-8,
-    demographic_events=demographic_events,length=1.0,record_migrations=True, recombination_rate=2e-8,num_replicates=n_replicates)
-
-#for i in dd.trees():
-#    print(i.draw(format="unicode"))
+    migration_matrix=migration_matrix,mutation_rate=1e-8,
+    demographic_events=demographic_events,record_migrations=True,length=1000000,random_seed=random_seed,recombination_rate=2e-8 ,num_replicates=n_replicates)
+#recombination_map=recomb_map
 
 events=0
+chrom=1
 for j in dd:
+    introgressed=[]
+    trueintrogressed=[]
+    leftchunks=[]
+    rightchunks=[]
+    who=[]
+    when=[]
+    
     for i in j.migrations():
+        
         if i.source==4 and i.dest==1:
-            events+=1
-            break
+            if ( str(i.left) not in leftchunks ) and ( str(i.right) not in rightchunks ):
+                leftchunks.append(str(i.left))
+                rightchunks.append(str(i.right))
+                who.append(str(i.node))
+                when.append(str(i.time))
+            if int(i.node) not in introgressed:
+                introgressed.append(int(i.node))
+                
+                #break
+    for tree in j.trees():
+        #print(tree.draw(format="unicode"))
+        for k in introgressed:
+            if tree.is_leaf(k)!=True:
+                for my in tree.get_leaves(k):
+                    if int(my) not in trueintrogressed:
+                        trueintrogressed.append(int(my))
+            else:
+                if int(k) not in trueintrogressed:
+                    trueintrogressed.append(int(k))
+        #print('recombinant: ',tree.interval)
+                
+                
+                
+          
+    if introgressed!=[]:
+        events+=1
+    
+    #print(j.genotype_matrix())
+    print('#####################################################################','\n')
+    modernsamples=[i for i in range(0,j.num_samples)]
+    trueintrogressedfinal=[x for x in trueintrogressed if x in modernsamples]
+    print('original introgressed nodes: ',introgressed)
+    print('number of trees (recombinations) : ',j.num_trees)
+    numberoftrees=j.num_trees
+    print('modern introgressed nodes: ',trueintrogressedfinal)
+    for r in range(0,len(leftchunks)):
+        print('From {} to {} was an introgression of the individual {} at time = {}'.format(leftchunks[r],rightchunks[r],who[r],when[r]))
+    print('The total naumber of introgressed segments is {}'.format(len(leftchunks)))
+    print('#####################################################################','\n')
 print(events/n_replicates)
