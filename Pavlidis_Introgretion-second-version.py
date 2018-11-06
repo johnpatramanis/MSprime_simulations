@@ -178,13 +178,13 @@ for j in dd:
 
         #print('recombinant: ',tree.interval)
     #print(j.genotype_matrix())
+    print('#######################','\n')
     modernsamples=[i for i in range(0,j.num_samples)]
     trueintrogressedfinal=[x for x in trueintrogressed if x in modernsamples]
     print('original introgressed nodes: ',introgressed)
     print('number of trees (recombinations) : ',j.num_trees)
     numberoftrees=j.num_trees
     print('modern introgressed nodes: ',trueintrogressedfinal)
-    print('#######################','\n')
     for r in range(0,len(leftchunks)):
         print('From {} to {} was an introgression of the individual {} at time = {}'.format(leftchunks[r],rightchunks[r],who[r],when[r]))
     print('The total naumber of introgressed segments is {}'.format(len(leftchunks)))
