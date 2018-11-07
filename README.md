@@ -1,10 +1,10 @@
 # MSprime_simulations
 Population Simulations for different scenarios
 
-#'Introgretion' files 
+#'Introgression' files 
 
-#Attemps at replicating introgretion events between Homo sapiens populations and other species/subspecies
-#Aim: Support/Descredit double introgretion 
+#Attemps at replicating introgression events between Homo sapiens populations and other species/subspecies
+#Aim: Support/Descredit double introgression 
 
 #'Test' files
 
