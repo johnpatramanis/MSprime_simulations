@@ -129,7 +129,7 @@ chrom=1
 
 #recomb_map=msprime.RecombinationMap.read_hapmap('genetic_map_GRCh37_chr{}.txt'.format(chrom))
 
-n_replicates=10
+n_replicates=1000
 random_seed=random.randint(0,100000)
 
 dd = msprime.simulate(samples=samples,
@@ -140,7 +140,9 @@ dd = msprime.simulate(samples=samples,
 
 events=0
 chrom=1
+out=open('genotypes{}.gen'.format(chrom),'w')
 for j in dd:
+    
     introgressed=[]
     trueintrogressed=[]
     leftchunks=[]
@@ -179,14 +181,27 @@ for j in dd:
         #print('recombinant: ',tree.interval)
     #print(j.genotype_matrix())
     print('#######################','\n')
+    out.write('#######################\n')
+    
     modernsamples=[i for i in range(0,j.num_samples)]
     trueintrogressedfinal=[x for x in trueintrogressed if x in modernsamples]
     print('original introgressed nodes: ',introgressed)
+    out.write('original introgressed nodes: {}\n'.format(introgressed))
+    
     print('number of trees (recombinations) : ',j.num_trees)
+    out.write('number of trees (recombinations) : {}\n'.format(j.num_trees))
+    
     numberoftrees=j.num_trees
     print('modern introgressed nodes: ',trueintrogressedfinal)
+    out.write('modern introgressed nodes: {} \n'.format(trueintrogressedfinal))
+    
     for r in range(0,len(leftchunks)):
         print('From {} to {} was an introgression of the individual {} at time = {}'.format(leftchunks[r],rightchunks[r],who[r],when[r]))
+        out.write('From {} to {} was an introgression of the individual {} at time = {}\n'.format(leftchunks[r],rightchunks[r],who[r],when[r]))
     print('The total naumber of introgressed segments is {}'.format(len(leftchunks)))
+    out.write('The total naumber of introgressed segments is {} \n'.format(len(leftchunks)))
+    out.write('#######################\n')
+    
+    
+    
 print(events/n_replicates)
-
