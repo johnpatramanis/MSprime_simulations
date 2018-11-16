@@ -67,9 +67,9 @@ migration_matrix = [
     [0,0,0,0,0,0],
     [0,0,0,0,0,0],
     [0,0,0,0,0,0],
-    [0,0,0,0,0.01,0.001],
-    [0,0,0,0.01,0,0.01],
-    [0,0,0,0.001,0.01,0]
+    [0,0,0,0,0,0],
+    [0,0,0,0,0,0],
+    [0,0,0,0,0,0]
 ]
 
 samples=[msprime.Sample(0,T_archaic_sampling)]*6 + [msprime.Sample(1,T_archaic_sampling)]*6 + [msprime.Sample(2,T_archaic_sampling)] *6 + [msprime.Sample(3,0)] *6 + [msprime.Sample(4,0)] *6 + [msprime.Sample(5,0)] *6
@@ -91,7 +91,7 @@ msprime.MigrationRateChange(time=T_split_EU_ASIA,rate=0),
 #Introgration
 
 msprime.MigrationRateChange(time=T_introgration1,rate=0, matrix_index=(1, 4)),
-msprime.MigrationRateChange(time=T_introgration1,rate=0.02, matrix_index=(4, 1)),
+msprime.MigrationRateChange(time=T_introgration1,rate=0.01, matrix_index=(4, 1)),
 
 #End of Introgration
 
@@ -149,6 +149,9 @@ for j in dd:
     rightchunks=[]
     who=[]
     when=[]
+    positions=[]
+    person_introgretions={}
+    modernsamples=[i for i in range(0,j.num_samples)]
     
     for i in j.migrations():
         
@@ -162,6 +165,13 @@ for j in dd:
                 introgressed.append(int(i.node))
                 events+=1
                 #break
+    for p in j.variants():
+        positions.append([p.position,p.index])
+    
+    
+    
+    
+    
     for tree in j.trees():
         #print(tree.draw(format="unicode"))
         for k in introgressed:
@@ -172,24 +182,47 @@ for j in dd:
             else:
                 if int(k) not in trueintrogressed:
                     trueintrogressed.append(int(k))
-                
-                
-                
-                
-          
 
+                    
+                    
+        trueintrogressedfinal=[x for x in trueintrogressed if x in modernsamples]
+    
+
+    
+        if trueintrogressed!=[]:
+            for ind in trueintrogressedfinal:
+                
+                
+                if tree.mrca(ind,10)> T_introgration1:     
+                    pass    
+                
+                if tree.mrca(ind,10)<= T_introgration1:
+                    try:
+                        person_introgretions[ind]+=1  
+                    except KeyError:
+                        person_introgretions[ind]=1
+    
+    
         #print('recombinant: ',tree.interval)
     #print(j.genotype_matrix())
     print('#######################','\n')
     out.write('#######################\n')
+    print('There are ',len(positions),' variants')
     
-    modernsamples=[i for i in range(0,j.num_samples)]
-    trueintrogressedfinal=[x for x in trueintrogressed if x in modernsamples]
+    
+    
+    
+    
     print('original introgressed nodes: ',introgressed)
     out.write('original introgressed nodes: {}\n'.format(introgressed))
     
     print('number of trees (recombinations) : ',j.num_trees)
     out.write('number of trees (recombinations) : {}\n'.format(j.num_trees))
+   
+    for k in person_introgretions:
+        print('The individual {} has {} introgression in him/her'.format(k,person_introgretions[k]/j.num_trees))
+    
+    
     
     numberoftrees=j.num_trees
     print('modern introgressed nodes: ',trueintrogressedfinal)
