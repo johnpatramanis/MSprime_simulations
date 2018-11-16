@@ -220,7 +220,7 @@ for j in dd:
     out.write('number of trees (recombinations) : {}\n'.format(j.num_trees))
    
     for k in person_introgretions:
-        print('The individual {} has {} introgression in him/her'.format(k,person_introgretions[k]/j.num_trees))
+        print('The individual {} has {} introgressed trees in him/her'.format(k,person_introgretions[k]/j.num_trees))
     
     
     
