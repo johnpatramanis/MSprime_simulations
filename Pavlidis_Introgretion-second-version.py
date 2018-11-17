@@ -3,7 +3,7 @@ import numpy as np
 import math
 import random as random
 
-
+#Population sizes
 
 N_OG_SAPIENS=10000
 N_OG_NEAD_DENI=10000
@@ -15,38 +15,43 @@ N_EU0=250
 N_ASIA0=250
 
 
-#bottleneck
+#time of bottlenecks
 
 
-
+#Growth rate
 r_EU=0.004
 
 r_ASIA=0.004
 r_AFRICA=0.001
 
 
+#Generation time
 generation_time = 29
 
 
+
+#Time is calculated in generations so Years/Generation time = Generations
+#Population Splits time
 T_split_SAPIENS_NEAD_DENI= 700000/generation_time
 T_split_NEAD_DENI= 350000/generation_time
 T_split_NEAD1_NEAD2= 130000/generation_time
 T_split_AFRICA_OUTOFAFRICA= 80000/generation_time
 T_split_EU_ASIA= 40000/generation_time
 
+#Time of introgression,time of archaic sampling
 T_introgration1=50000/generation_time
 T_archaic_sampling=50000/generation_time
 
 
 
-
+#Modern populations size
 N_AFRICA=N_OG_SAPIENS / math.exp(-r_AFRICA * T_split_AFRICA_OUTOFAFRICA)
 N_EU=N_EU0 / math.exp(-r_EU * T_split_EU_ASIA)
 N_ASIA=N_ASIA0 / math.exp(-r_ASIA * T_split_EU_ASIA)
 
 
 
-
+#Set up our populations
 population_configurations = [
     msprime.PopulationConfiguration(initial_size=N_DENI),
     msprime.PopulationConfiguration(initial_size=N_NEAD1),
@@ -56,12 +61,9 @@ population_configurations = [
     msprime.PopulationConfiguration(initial_size=N_ASIA)
 ]
 
-#migrations
-m_=0.00001
-#m_T1=131
 
 
-
+#Our migration matrix
 migration_matrix = [
 ####DE,NE1,NE2,AF,EU,AS##
     [0,0,0,0,0,0],
@@ -72,6 +74,7 @@ migration_matrix = [
     [0,0,0,0,0,0]
 ]
 
+#How many samples from each population, when msprime.Sample(whichpop, when)
 samples=[msprime.Sample(0,T_archaic_sampling)]*6 + [msprime.Sample(1,T_archaic_sampling)]*6 + [msprime.Sample(2,T_archaic_sampling)] *6 + [msprime.Sample(3,0)] *6 + [msprime.Sample(4,0)] *6 + [msprime.Sample(5,0)] *6
 
 
@@ -126,12 +129,16 @@ msprime.MassMigration(time=T_split_SAPIENS_NEAD_DENI,source=3,destination=0,prop
 ]
 
 chrom=1
+# I have successfully used the following to load the recombination map of chromosome 1 so the length and recombination rates parameters
+# of the Simulation match chromosome (can be one with the others as well0 but had 'memory error' problems
 
 #recomb_map=msprime.RecombinationMap.read_hapmap('genetic_map_GRCh37_chr{}.txt'.format(chrom))
 
+#Number of replications, not all reps have an introgression
 n_replicates=1000
 random_seed=random.randint(0,100000)
 
+#The actual simulation begins, all info is stored in the dd object
 dd = msprime.simulate(samples=samples,
     population_configurations=population_configurations,
     migration_matrix=migration_matrix,mutation_rate=1e-8,
@@ -140,7 +147,9 @@ dd = msprime.simulate(samples=samples,
 
 events=0
 chrom=1
-out=open('genotypes{}.gen'.format(chrom),'w')
+#Output file 1 
+out=open('Info_{}.gen'.format(chrom),'w')
+out2=open('genotypes_{}.gen'.format(chrom),'w')
 for j in dd:
     
     introgressed=[]
@@ -154,27 +163,33 @@ for j in dd:
     person_chunks={}
     modernsamples=[i for i in range(0,j.num_samples)]
     
+    #Cycle through all migrations that happened
     for i in j.migrations():
         
+        #Only interested of migrations from Pop1 (NEAN1) to Pop4 (Asia but also Eurasia ancest pop )
         if i.source==4 and i.dest==1:
-            if ( str(i.left) not in leftchunks ) and ( str(i.right) not in rightchunks ):
-                leftchunks.append(str(i.left))
-                rightchunks.append(str(i.right))
-                who.append(str(i.node))
-                when.append(str(i.time))
-            if int(i.node) not in introgressed:
+            if ( str(i.left) not in leftchunks ) and ( str(i.right) not in rightchunks ): #if not yet in our collection, add  it
+                leftchunks.append(str(i.left))   #original introgressed chunk
+                rightchunks.append(str(i.right)) #original introgressed chunk
+                who.append(str(i.node))          #original introgressed individual
+                when.append(str(i.time))         # time of introgretion
+            if int(i.node) not in introgressed: #all original introgressed individuals
                 introgressed.append(int(i.node))
                 events+=1
                 #break
     for p in j.variants():
         positions.append([p.position,p.index])
-    
+        #all variants position and their number, we will need it later to see wich variants belong to neand
     
     
     
     
     for tree in j.trees():
+        #Now we cycle through all recombinating segments of our sequence
+        #we can print the tree/history of each sement
         #print(tree.draw(format="unicode"))
+        
+        #We wan to see for each segment where the children of the original introgressed segment went (eg through recombination some segments can migrate to other individuals)
         for k in introgressed:
             if tree.is_leaf(k)!=True:
                 for my in tree.get_leaves(k):
@@ -185,16 +200,17 @@ for j in dd:
                     trueintrogressed.append(int(k))
 
                     
-                    
+        #keep only the modern people that have introgressedsegments       
         trueintrogressedfinal=[x for x in trueintrogressed if x in modernsamples]
     
 
-    
+        # cycle through modern people that have an introgressed segment and see if this particular we are now (for tree in j.trees)
+        # is introgressed in each individual
         if trueintrogressed!=[]:
             for ind in trueintrogressedfinal:
                 
                 #print(tree.tmrca(ind,10))
-                if tree.tmrca(ind,8) > 50000:     
+                if tree.tmrca(ind,8) > 50000:  # 50000 is the year we have set for the introgretion event, note that for some reason here tmrca return years not generations   
                     pass    
                 
                 if tree.tmrca(ind,8) <= 50000:
