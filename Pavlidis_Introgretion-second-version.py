@@ -151,6 +151,7 @@ for j in dd:
     when=[]
     positions=[]
     person_introgretions={}
+    person_chunks={}
     modernsamples=[i for i in range(0,j.num_samples)]
     
     for i in j.migrations():
@@ -192,16 +193,19 @@ for j in dd:
         if trueintrogressed!=[]:
             for ind in trueintrogressedfinal:
                 
-                
-                if tree.mrca(ind,10)> T_introgration1:     
+                #print(tree.tmrca(ind,10))
+                if tree.tmrca(ind,8) > 50000:     
                     pass    
                 
-                if tree.mrca(ind,10)<= T_introgration1:
+                if tree.tmrca(ind,8) <= 50000:
                     try:
-                        person_introgretions[ind]+=1  
+                        person_introgretions[ind]+=1                                        
                     except KeyError:
                         person_introgretions[ind]=1
-    
+                    try:
+                        person_chunks[ind].append(tree.interval)
+                    except KeyError:
+                        person_chunks[ind]=[ tree.interval ]
     
         #print('recombinant: ',tree.interval)
     #print(j.genotype_matrix())
@@ -231,8 +235,11 @@ for j in dd:
     for r in range(0,len(leftchunks)):
         print('From {} to {} was an introgression of the individual {} at time = {}'.format(leftchunks[r],rightchunks[r],who[r],when[r]))
         out.write('From {} to {} was an introgression of the individual {} at time = {}\n'.format(leftchunks[r],rightchunks[r],who[r],when[r]))
-    print('The total naumber of introgressed segments is {}'.format(len(leftchunks)))
-    out.write('The total naumber of introgressed segments is {} \n'.format(len(leftchunks)))
+    
+    for chunk in  person_chunks:
+        print('Person {} has {} chunks of introgretion in him/her '.format(chunk,len(person_chunks[chunk])))    
+        
+
     out.write('#######################\n')
     
     
