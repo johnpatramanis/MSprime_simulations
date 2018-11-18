@@ -93,7 +93,7 @@ msprime.MigrationRateChange(time=T_split_EU_ASIA,rate=0),
 #Introgration
 
 msprime.MigrationRateChange(time=T_introgration1,rate=0, matrix_index=(1, 4)),
-msprime.MigrationRateChange(time=T_introgration1,rate=0.02, matrix_index=(4, 1)),
+msprime.MigrationRateChange(time=T_introgration1,rate=0.01, matrix_index=(4, 1)),
 
 #End of Introgration
 
@@ -209,11 +209,13 @@ for j in dd:
         if trueintrogressed!=[]:
             for ind in trueintrogressedfinal:
                 
-                #print(tree.tmrca(ind,10))
-                if tree.tmrca(ind,8) > 50000:  # 50000 is the year we have set for the introgretion event, note that for some reason here tmrca return years not generations   
+                #print('ind',tree.tmrca(ind,8))
+                #print('african',tree.tmrca(20,8))
+
+                if tree.tmrca(ind,8) == tree.tmrca(20,8):  # 50000 is the year we have set for the introgretion event, note that for some reason here tmrca return years not generations   
                     pass    
                 
-                if tree.tmrca(ind,8) <= 50000:
+                if tree.tmrca(ind,8) < tree.tmrca(20,8):
                     try:
                         person_introgretions[ind]+=1                                        
                     except KeyError:
