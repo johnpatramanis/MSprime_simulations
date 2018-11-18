@@ -11,17 +11,16 @@ N_NEAD1=5000
 N_NEAD2=5000
 N_DENI=5000
 N_OUT_OF_AFRICA=500
-N_EU0=250
-N_ASIA0=250
+N_EU0=500
+N_ASIA0=500
 
 
 #time of bottlenecks
 
 
 #Growth rate
-r_EU=0.004
-
-r_ASIA=0.004
+r_EU=0.01
+r_ASIA=0.01
 r_AFRICA=0.001
 
 
@@ -94,12 +93,12 @@ msprime.MigrationRateChange(time=T_split_EU_ASIA,rate=0),
 #Introgration
 
 msprime.MigrationRateChange(time=T_introgration1,rate=0, matrix_index=(1, 4)),
-msprime.MigrationRateChange(time=T_introgration1,rate=0.01, matrix_index=(4, 1)),
+msprime.MigrationRateChange(time=T_introgration1,rate=0.02, matrix_index=(4, 1)),
 
 #End of Introgration
 
-msprime.MigrationRateChange(time=T_introgration1+5,rate=0, matrix_index=(1, 4)),
-msprime.MigrationRateChange(time=T_introgration1+5,rate=0, matrix_index=(4, 1)),
+msprime.MigrationRateChange(time=T_introgration1+1,rate=0, matrix_index=(1, 4)),
+msprime.MigrationRateChange(time=T_introgration1+1,rate=0, matrix_index=(4, 1)),
 
 
 
@@ -136,13 +135,14 @@ chrom=1
 
 #Number of replications, not all reps have an introgression
 n_replicates=1000
+LENGTH=1e+6
 random_seed=random.randint(0,100000)
 
 #The actual simulation begins, all info is stored in the dd object
 dd = msprime.simulate(samples=samples,
     population_configurations=population_configurations,
     migration_matrix=migration_matrix,mutation_rate=1e-8,
-    demographic_events=demographic_events,record_migrations=True,length=1000000,random_seed=random_seed,recombination_rate=2e-8 ,num_replicates=n_replicates)
+    demographic_events=demographic_events,record_migrations=True,length=LENGTH,random_seed=random_seed,recombination_rate=2e-8 ,num_replicates=n_replicates)
 #recombination_map=recomb_map
 
 events=0
@@ -222,7 +222,27 @@ for j in dd:
                         person_chunks[ind].append(tree.interval)
                     except KeyError:
                         person_chunks[ind]=[ tree.interval ]
+            
+    for i in person_chunks:
+        temporary_person_chunks=[]
+        temporary_person_chunks.append(list(person_chunks[i][0]))
+        for k in person_chunks[i][1:]:
+            if k[0]==temporary_person_chunks[-1][1]:
+                temporary_person_chunks[-1][1]=k[1]
+            else:
+                temporary_person_chunks.append(list(k))
+                
+        person_chunks[i]=temporary_person_chunks
     
+            
+
+
+
+
+
+
+            
+            
         #print('recombinant: ',tree.interval)
     #print(j.genotype_matrix())
     print('#######################','\n')
@@ -253,9 +273,14 @@ for j in dd:
         out.write('From {} to {} was an introgression of the individual {} at time = {}\n'.format(leftchunks[r],rightchunks[r],who[r],when[r]))
     
     for chunk in  person_chunks:
-        print('Person {} has {} chunks of introgretion in him/her '.format(chunk,len(person_chunks[chunk])))    
-        
+        introgressionsum=0
+        for i in person_chunks[chunk]:
+            add=i[1]-i[0]
+            introgressionsum+=add
+        print('Person {} has {} chunks of introgretion in him/her '.format(chunk,introgressionsum/LENGTH))    
+    
 
+    
     out.write('#######################\n')
     
     
