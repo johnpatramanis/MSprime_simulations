@@ -74,12 +74,15 @@ migration_matrix = [
 ]
 
 #How many samples from each population, when msprime.Sample(whichpop, when)
-samples=[msprime.Sample(0,T_archaic_sampling)]*6 + [msprime.Sample(1,T_archaic_sampling)]*6 + [msprime.Sample(2,T_archaic_sampling)] *6 + [msprime.Sample(3,0)] *6 + [msprime.Sample(4,0)] *6 + [msprime.Sample(5,0)] *6
+samples=[msprime.Sample(0,T_archaic_sampling)]*6 + [msprime.Sample(1,T_archaic_sampling)]*6 + [msprime.Sample(2,T_archaic_sampling)] *6 + [msprime.Sample(3,0)] *6 + [msprime.Sample(4,0)] *20 + [msprime.Sample(5,0)] *20
 
 
 demographic_events = [
 ######################################################################################
 #Split EU-AS ,migrations set to 0, growth set to 0, population 4 size set to out_of_africa
+#msprime.MigrationRateChange(time=T_split_EU_ASIA-10,rate=0.01, matrix_index=(4, 3)),
+#msprime.MigrationRateChange(time=T_split_EU_ASIA-10,rate=0.01, matrix_index=(5, 3)),
+
 
 msprime.MassMigration(time=T_split_EU_ASIA,source=5,destination=4,proportion = 1.0),
 
@@ -131,18 +134,18 @@ chrom=1
 # I have successfully used the following to load the recombination map of chromosome 1 so the length and recombination rates parameters
 # of the Simulation match chromosome (can be one with the others as well0 but had 'memory error' problems
 
-#recomb_map=msprime.RecombinationMap.read_hapmap('genetic_map_GRCh37_chr{}.txt'.format(chrom))
+recomb_map=msprime.RecombinationMap.read_hapmap('genetic_map_GRCh37_chr{}.txt'.format(chrom))
 
 #Number of replications, not all reps have an introgression
 n_replicates=1000
-LENGTH=1e+6
+LENGTH=10e+5
 random_seed=random.randint(0,100000)
 
 #The actual simulation begins, all info is stored in the dd object
 dd = msprime.simulate(samples=samples,
     population_configurations=population_configurations,
     migration_matrix=migration_matrix,mutation_rate=1e-8,
-    demographic_events=demographic_events,record_migrations=True,length=LENGTH,random_seed=random_seed,recombination_rate=2e-8 ,num_replicates=n_replicates)
+    demographic_events=demographic_events,record_migrations=True,random_seed=random_seed,length=LENGTH, recombination_rate=2e-8 ,num_replicates=n_replicates)
 #recombination_map=recomb_map
 
 events=0
