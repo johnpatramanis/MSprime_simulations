@@ -134,7 +134,7 @@ chrom=1
 # I have successfully used the following to load the recombination map of chromosome 1 so the length and recombination rates parameters
 # of the Simulation match chromosome (can be one with the others as well0 but had 'memory error' problems
 
-recomb_map=msprime.RecombinationMap.read_hapmap('genetic_map_GRCh37_chr{}.txt'.format(chrom))
+#recomb_map=msprime.RecombinationMap.read_hapmap('genetic_map_GRCh37_chr{}.txt'.format(chrom))
 
 #Number of replications, not all reps have an introgression
 n_replicates=1000
