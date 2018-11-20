@@ -137,7 +137,7 @@ chrom=1
 #recomb_map=msprime.RecombinationMap.read_hapmap('genetic_map_GRCh37_chr{}.txt'.format(chrom))
 
 #Number of replications, not all reps have an introgression
-n_replicates=1000
+n_replicates=10
 LENGTH=10e+5
 random_seed=random.randint(0,100000)
 
