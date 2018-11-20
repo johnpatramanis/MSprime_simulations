@@ -96,7 +96,7 @@ msprime.MigrationRateChange(time=T_split_EU_ASIA,rate=0),
 #Introgration
 
 msprime.MigrationRateChange(time=T_introgration1,rate=0, matrix_index=(1, 4)),
-msprime.MigrationRateChange(time=T_introgration1,rate=0.01, matrix_index=(4, 1)),
+msprime.MigrationRateChange(time=T_introgration1,rate=0.02, matrix_index=(4, 1)),
 
 #End of Introgration
 
@@ -153,6 +153,7 @@ chrom=1
 #Output file 1 
 out=open('Info_{}.gen'.format(chrom),'w')
 out2=open('genotypes_{}.gen'.format(chrom),'w')
+out3=open('introgessions_{}.gen'.format(chrom),'w')
 for j in dd:
     
     introgressed=[]
@@ -165,6 +166,16 @@ for j in dd:
     person_introgretions={}
     person_chunks={}
     modernsamples=[i for i in range(0,j.num_samples)]
+    
+    #print out the genotypes 1 line = 1 variant 
+    for var in j.variants():
+        for indvar in var.genotypes:
+            out2.write(str(indvar))
+        out2.write('\n')
+    out2.write('#################################################################################################################################\n')
+    
+    
+    
     
     #Cycle through all migrations that happened
     for i in j.migrations():
@@ -187,7 +198,10 @@ for j in dd:
     
     
     
+    RecombinatingSegments={}
+    RC=0
     for tree in j.trees():
+        INTS=0
         #Now we cycle through all recombinating segments of our sequence
         #we can print the tree/history of each sement
         #print(tree.draw(format="unicode"))
@@ -214,11 +228,12 @@ for j in dd:
                 
                 #print('ind',tree.tmrca(ind,8))
                 #print('african',tree.tmrca(20,8))
-
-                if tree.tmrca(ind,8) == tree.tmrca(20,8):  # 50000 is the year we have set for the introgretion event, note that for some reason here tmrca return years not generations   
+    
+                if tree.population(tree.mrca(ind,8))==0:  #if the mrca of th individual and a Neanderthal (8) belongs to population 0 then its not an introgressed segment   
                     pass    
                 
-                if tree.tmrca(ind,8) < tree.tmrca(20,8):
+                if tree.population(tree.mrca(ind,8))==1 or tree.population(tree.mrca(ind,8))==2:#if it belongs to population 1 or 2 (Neaderthal pops) then its an introgressed seg
+                    INTS+=1
                     try:
                         person_introgretions[ind]+=1                                        
                     except KeyError:
@@ -227,7 +242,15 @@ for j in dd:
                         person_chunks[ind].append(tree.interval)
                     except KeyError:
                         person_chunks[ind]=[ tree.interval ]
-            
+                    
+        RecombinatingSegments[RC]=INTS
+        RC+=1
+    
+    
+    
+    
+    
+    
     for i in person_chunks:
         temporary_person_chunks=[]
         temporary_person_chunks.append(list(person_chunks[i][0]))
@@ -284,7 +307,7 @@ for j in dd:
             introgressionsum+=add
         print('Person {} has {} chunks of introgretion in him/her '.format(chunk,introgressionsum/LENGTH))    
     
-
+    
     
     out.write('#######################\n')
     
