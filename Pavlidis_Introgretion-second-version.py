@@ -96,7 +96,7 @@ msprime.MigrationRateChange(time=T_split_EU_ASIA,rate=0),
 #Introgration
 
 msprime.MigrationRateChange(time=T_introgration1,rate=0, matrix_index=(1, 4)),
-msprime.MigrationRateChange(time=T_introgration1,rate=0.02, matrix_index=(4, 1)),
+msprime.MigrationRateChange(time=T_introgration1,rate=0.05, matrix_index=(4, 1)),
 
 #End of Introgration
 
@@ -289,7 +289,7 @@ for j in dd:
    
     for k in person_introgretions:
         print('The individual {} has {} introgressed trees in him/her'.format(k,person_introgretions[k]/j.num_trees))
-    
+        out.write('The individual {} has {} introgressed trees in him/her \n'.format(k,person_introgretions[k]/j.num_trees))
     
     
     numberoftrees=j.num_trees
@@ -306,8 +306,7 @@ for j in dd:
             add=i[1]-i[0]
             introgressionsum+=add
         print('Person {} has {} chunks of introgretion in him/her '.format(chunk,introgressionsum/LENGTH))    
-    
-    
+        out.write('Person {} has {} chunks of introgretion in him/her \n'.format(chunk,introgressionsum/LENGTH))
     
     out.write('#######################\n')
     
