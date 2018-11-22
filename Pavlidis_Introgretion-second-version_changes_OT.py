@@ -276,10 +276,13 @@ for j in dd:
                 #print('ind-afric',np.mean([tree.tmrca(ind,x) for x in range(18,23)]))
 
 
-                if (tree.population(tree.mrca(ind,8))==0 ) and (np.mean([tree.tmrca(ind,x) for x in range(6,11)])>=np.mean([tree.tmrca(ind,x) for x in range(18,23)]) ):  #if the mrca of th individual and a Neanderthal (8) belongs to population 0 then its not an introgressed segment   
+                if tree.population(tree.mrca(ind,8))==0 :  #if the mrca of th individual and a Neanderthal (8) belongs to population 0 then its not an introgressed segment   
                     pass    
                 
-                else:#if it belongs to population 1 or 2 (Neaderthal pops) then its an introgressed seg
+                if tree.population(tree.mrca(ind,8))!=0 and tree.population(tree.mrca(ind,8))!=1 and tree.population(tree.mrca(ind,8))!=2 :
+                    print('anomaly')
+                
+                if tree.population(tree.mrca(ind,8))==1 or tree.population(tree.mrca(ind,8))==2:#if it belongs to population 1 or 2 (Neaderthal pops) then its an introgressed seg
                     INTS+=1
                     try:
                         person_introgretions[ind]+=1
