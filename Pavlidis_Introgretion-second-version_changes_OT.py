@@ -28,7 +28,6 @@ N_EASN_beforeExpGrowth = 8879
 #N_ASIA0=250
 
 
-#bottleneck
 
 
 # #assuming generation time = 25
@@ -64,6 +63,11 @@ T_exp_growth = 5115/generation_time
 # N_EU=N_EU0 / math.exp(-r_EU * T_split_EU_ASIA)
 # N_ASIA=N_ASIA0 / math.exp(-r_ASIA * T_split_EU_ASIA)
 
+N_OUT_OF_AFRICA = 1861 
+N_EUR_atSplit_EU_ASIA = 1032
+N_EASN_atSplit_EU_ASIA = 550
+
+
 
 #I would recommend the following: based on the model given in Vernot and Akey 2014 (time at which growth starts taken from Gravel et al 2011)
 N_AFRICA= N_AFR_beforeExpGrowth / math.exp(-r_AFRICA * T_exp_growth) #at the time = 5115 years ago
@@ -78,9 +82,9 @@ population_configurations = [
     msprime.PopulationConfiguration(initial_size=N_DENI),
     msprime.PopulationConfiguration(initial_size=N_NEAD1),
     msprime.PopulationConfiguration(initial_size=N_NEAD2),
-    msprime.PopulationConfiguration(initial_size=N_AFRICA),
-    msprime.PopulationConfiguration(initial_size=N_EU),
-    msprime.PopulationConfiguration(initial_size=N_ASIA)
+    msprime.PopulationConfiguration(initial_size=N_AFRICA,growth_rate = r_AFRICA),
+    msprime.PopulationConfiguration(initial_size=N_EU, growth_rate = r_EU),
+    msprime.PopulationConfiguration(initial_size=N_ASIA, growth_rate = r_ASIA)
 ]
 
 #migrations
@@ -104,19 +108,27 @@ samples=[msprime.Sample(0,T_archaic_sampling)]*6 + [msprime.Sample(1,T_archaic_s
 
 demographic_events = [
 ######################################################################################
-#Split EU-AS ,migrations set to 0, growth set to 0, population 4 size set to out_of_africa
+#Exponential growth begins
 
 
-msprime.PopulationParametersChange(time =T_exp_growth , initial_size = N_AFR_beforeExpGrowth, growth_rate = r_AFRICA, population_id = 3),
-msprime.PopulationParametersChange(time =T_exp_growth , initial_size = N_EUR_beforeExpGrowth, growth_rate = r_EU, population_id = 4),
-msprime.PopulationParametersChange(time =T_exp_growth , initial_size = N_EASN_beforeExpGrowth, growth_rate = r_ASIA, population_id = 5),
+msprime.PopulationParametersChange(time =T_exp_growth , growth_rate = 0 , population_id = 3),
+
+msprime.PopulationParametersChange(time =T_exp_growth , growth_rate = 0.003 , population_id = 4),
+msprime.PopulationParametersChange(time =T_exp_growth ,growth_rate=0.003 , population_id = 5),
+
+#######################################################################################
+#Split of Eu and Asia ,bottleneck,steady growth 
+
+
+msprime.PopulationParametersChange(time =T_split_EU_ASIA , growth_rate = 0 , population_id = 4),
+msprime.PopulationParametersChange(time =T_split_EU_ASIA ,growth_rate=0 , population_id = 5),
+
+msprime.PopulationParametersChange(time =T_split_EU_ASIA , initial_size = N_EUR_atSplit_EU_ASIA , population_id = 4),
+msprime.PopulationParametersChange(time =T_split_EU_ASIA , initial_size = N_EASN_atSplit_EU_ASIA, population_id = 5),
+
+
 
 msprime.MassMigration(time=T_split_EU_ASIA,source=5,destination=4,proportion = 1.0),
-
-msprime.PopulationParametersChange(time =T_split_EU_ASIA , initial_size = N_EUR_atSplit_EU_ASIA , growth_rate = 0, population_id = 4),
-msprime.PopulationParametersChange(time =T_split_EU_ASIA , initial_size = N_EASN_atSplit_EU_ASIA, growth_rate = 0, population_id = 5),
-
-
 
 msprime.MigrationRateChange(time=T_split_EU_ASIA,rate=0), ##didn't know how to change here!
 
@@ -137,6 +149,8 @@ msprime.MigrationRateChange(time=T_introgration1+1,rate=0, matrix_index=(4, 1)),
 
 ########################################################################################
 #Split Africa-Eurasian, population 3 size set to homo sapiens
+
+msprime.PopulationParametersChange(time =T_split_AFRICA_OUTOFAFRICA , initial_size = N_OUT_OF_AFRICA , growth_rate = 0, population_id = 4),
 
 msprime.MassMigration(time=T_split_AFRICA_OUTOFAFRICA,source=4,destination=3,proportion = 1.0),
 
@@ -166,9 +180,18 @@ chrom=1
 #recomb_map=msprime.RecombinationMap.read_hapmap('genetic_map_GRCh37_chr{}.txt'.format(chrom))
 
 #Number of replications, not all reps have an introgression
-n_replicates=1000
+n_replicates=10000
 LENGTH=10e+5
 random_seed=random.randint(0,100000)
+
+#DEMOGRAPHY DEBUGGER
+#dd = msprime.DemographyDebugger(
+#    population_configurations=population_configurations,
+#    migration_matrix=migration_matrix,
+#    demographic_events=demographic_events)
+#dd.print_history()
+    
+    
 
 #The actual simulation begins, all info is stored in the dd object
 dd = msprime.simulate(samples=samples,
