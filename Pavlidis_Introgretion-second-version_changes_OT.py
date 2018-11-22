@@ -23,9 +23,7 @@ N_EASN_atSplit_EU_ASIA = 550
 N_AFR_beforeExpGrowth = 14474
 N_EUR_beforeExpGrowth = 9475
 N_EASN_beforeExpGrowth = 8879
-####	
-#N_EU0=250
-#N_ASIA0=250
+####
 
 
 
@@ -184,7 +182,7 @@ n_replicates=10000
 LENGTH=10e+5
 random_seed=random.randint(0,100000)
 
-#DEMOGRAPHY DEBUGGER
+#DEMOGRAPHY DEBUGGER -> un-hash this part to print the model
 #dd = msprime.DemographyDebugger(
 #    population_configurations=population_configurations,
 #    migration_matrix=migration_matrix,
@@ -192,7 +190,7 @@ random_seed=random.randint(0,100000)
 #dd.print_history()
     
     
-
+# Hash it if you want to see only the demography debugger
 #The actual simulation begins, all info is stored in the dd object
 dd = msprime.simulate(samples=samples,
     population_configurations=population_configurations,
@@ -219,15 +217,7 @@ for j in dd:
     person_chunks={}
     modernsamples=[i for i in range(0,j.num_samples)]
     
-    #print out the genotypes 1 line = 1 variant 
-    for var in j.variants():
-        for indvar in var.genotypes:
-            out2.write(str(indvar))
-        out2.write('\n')
-    out2.write('#################################################################################################################################\n')
-    
-    
-    
+
     
     #Cycle through all migrations that happened
     for i in j.migrations():
@@ -278,16 +268,17 @@ for j in dd:
         if trueintrogressed!=[]:
             for ind in trueintrogressedfinal:
                 
-                #print('ind',tree.tmrca(ind,8))
-                #print('african',tree.tmrca(20,8))
-    
-                if tree.population(tree.mrca(ind,8))==0:  #if the mrca of th individual and a Neanderthal (8) belongs to population 0 then its not an introgressed segment   
+                #print('ind-nead',np.mean([tree.tmrca(ind,x) for x in range(6,11)]))
+                #print('ind-afric',np.mean([tree.tmrca(ind,x) for x in range(18,23)]))
+
+
+                if (tree.population(tree.mrca(ind,8))==0 ) and (np.mean([tree.tmrca(ind,x) for x in range(6,11)])>=np.mean([tree.tmrca(ind,x) for x in range(18,23)]) ):  #if the mrca of th individual and a Neanderthal (8) belongs to population 0 then its not an introgressed segment   
                     pass    
                 
-                if tree.population(tree.mrca(ind,8))==1 or tree.population(tree.mrca(ind,8))==2:#if it belongs to population 1 or 2 (Neaderthal pops) then its an introgressed seg
+                else:#if it belongs to population 1 or 2 (Neaderthal pops) then its an introgressed seg
                     INTS+=1
                     try:
-                        person_introgretions[ind]+=1                                        
+                        person_introgretions[ind]+=1
                     except KeyError:
                         person_introgretions[ind]=1
                     try:
@@ -361,6 +352,18 @@ for j in dd:
         out.write('Person {} has {} chunks of introgretion in him/her \n'.format(chunk,introgressionsum/LENGTH))
     
     out.write('#######################\n')
+    if trueintrogressed!=[]:
+        for var in j.variants():
+            for indvar in var.genotypes:
+                out2.write(str(indvar))
+            out2.write('\n')
+        out2.write('#################################################################################################################################\n')
+    
+    #print(len(person_chunks),len(trueintrogressedfinal))
+    
+    
+    
+    
     
     
     
