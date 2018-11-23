@@ -36,9 +36,9 @@ N_EASN_beforeExpGrowth = 8879
 # generation_time = 25
 
 ##assuming generation time = 29 - multiplying above values by  29/25 
-r_EU = 0.45
-r_ASIA= 0.56
-r_AFRICA= 0.02
+r_EU = 0.0226197294141683734 #corrected exponential growth rates
+r_ASIA= 0.028572397366705403
+r_AFRICA= 0.019148313407347897
 
 generation_time = 29
 
