@@ -343,8 +343,8 @@ for j in dd:
     
     
     numberoftrees=j.num_trees
-    print('modern introgressed nodes: ',trueintrogressedfinal)
-    out.write('modern introgressed nodes: {} \n'.format(trueintrogressedfinal))
+    print('modern descendants of introgressed nodes: ',trueintrogressedfinal)
+    out.write('modern descendants of introgressed nodes: {} \n'.format(trueintrogressedfinal))
     
     for r in range(0,len(leftchunks)):
         print('From {} to {} was an introgression of the individual {} at time = {}'.format(leftchunks[r],rightchunks[r],who[r],when[r]))
