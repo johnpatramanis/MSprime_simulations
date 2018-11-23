@@ -160,7 +160,8 @@ msprime.MigrationRateChange(time=T_introgration1+1,rate=0, matrix_index=(4, 1)),
 msprime.PopulationParametersChange(time =T_split_AFRICA_OUTOFAFRICA , initial_size = N_OUT_OF_AFRICA , growth_rate = 0, population_id = 4),
 
 msprime.MassMigration(time=T_split_AFRICA_OUTOFAFRICA,source=4,destination=3,proportion = 1.0),
-
+msprime.MigrationRateChange(time=T_split_AFRICA_OUTOFAFRICA,rate=0)
+    
 msprime.PopulationParametersChange(time =T_split_AFRICA_OUTOFAFRICA , initial_size = N_OG_SAPIENS , growth_rate = 0, population_id = 4),
 
 ########################################################################################
