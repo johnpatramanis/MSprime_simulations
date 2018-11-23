@@ -139,7 +139,7 @@ msprime.MigrationRateChange(time=T_introgration1,rate=0, matrix_index=(4, 1)),
 
 
 msprime.MigrationRateChange(time=T_introgration1,rate=0, matrix_index=(1, 4)),
-msprime.MigrationRateChange(time=T_introgration1,rate=0.001, matrix_index=(4, 1)),
+msprime.MigrationRateChange(time=T_introgration1,rate=0.01, matrix_index=(4, 1)),
 
 #End of Introgration
 
