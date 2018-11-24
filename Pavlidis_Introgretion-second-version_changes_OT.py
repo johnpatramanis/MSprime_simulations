@@ -129,11 +129,11 @@ msprime.PopulationParametersChange(time =T_split_EU_ASIA , initial_size = N_EASN
 msprime.MassMigration(time=T_split_EU_ASIA,source=5,destination=4,proportion = 1.0),
 
 #this seems to be redundant - or perhaps wrong - am I missing something?
-msprime.MigrationRateChange(time=T_split_EU_ASIA,rate=0) ##didn't know how to change here!
+msprime.MigrationRateChange(time=T_split_EU_ASIA,rate=0), ##didn't know how to change here!
 
 ##does this look correct here? - wanted to set a new migration rate between the ancestors of Eurasians and Africans
-msprime.MigrationRateChange(time=T_split_EU_ASIA,rate=0.0001498975, matrix_index=(4, 3))  
-msprime.MigrationRateChange(time=T_split_EU_ASIA,rate=0.0001498975, matrix_index=(3, 4)) 
+msprime.MigrationRateChange(time=T_split_EU_ASIA,rate=0.0001498975, matrix_index=(4,3)), 
+msprime.MigrationRateChange(time=T_split_EU_ASIA,rate=0.0001498975, matrix_index=(3,4)),
     
 ########################################################################################
 
@@ -160,7 +160,7 @@ msprime.MigrationRateChange(time=T_introgration1+1,rate=0, matrix_index=(4, 1)),
 msprime.PopulationParametersChange(time =T_split_AFRICA_OUTOFAFRICA , initial_size = N_OUT_OF_AFRICA , growth_rate = 0, population_id = 4),
 
 msprime.MassMigration(time=T_split_AFRICA_OUTOFAFRICA,source=4,destination=3,proportion = 1.0),
-msprime.MigrationRateChange(time=T_split_AFRICA_OUTOFAFRICA,rate=0)
+msprime.MigrationRateChange(time=T_split_AFRICA_OUTOFAFRICA,rate=0),
     
 msprime.PopulationParametersChange(time =T_split_AFRICA_OUTOFAFRICA , initial_size = N_OG_SAPIENS , growth_rate = 0, population_id = 4),
 
