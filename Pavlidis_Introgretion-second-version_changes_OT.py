@@ -235,9 +235,9 @@ for j in dd:
         #Only interested of migrations from Pop1 (NEAN1) to Pop4 (Asia but also Eurasia ancest pop )
         if i.source==4 and i.dest==1:
             if ( str(i.left) not in leftchunks ) and ( str(i.right) not in rightchunks ): #if not yet in our collection, add  it
-                leftchunks.append(str(i.left))   #original introgressed chunk
-                rightchunks.append(str(i.right)) #original introgressed chunk
-                who.append(str(i.node))          #original introgressed individual
+                leftchunks.append(float(i.left))   #original introgressed chunk
+                rightchunks.append(float(i.right)) #original introgressed chunk
+                who.append(int(i.node))          #original introgressed individual
                 when.append(str(i.time))         # time of introgretion
             if int(i.node) not in introgressed: #all original introgressed individuals
                 introgressed.append(int(i.node))
@@ -259,17 +259,18 @@ for j in dd:
         #print(tree.draw(format="unicode"))
         
         #We wan to see for each segment where the children of the original introgressed segment went (eg through recombination some segments can migrate to other individuals)
-        for k in introgressed:
-            if tree.is_leaf(k)!=True:
-                for my in tree.get_leaves(k):
-                    if int(my) not in trueintrogressed:
-                        trueintrogressed.append(int(my))
-            else:
-                if int(k) not in trueintrogressed:
-                    trueintrogressed.append(int(k))
-
-                    
-        #keep only the modern people that have introgressedsegments       
+        for k in range(0,len(who)):
+            if leftchunks[k]<=tree.interval[0] and tree.interval[1]<=rightchunks[k]:
+                if tree.is_leaf(who[k])!=True:
+                    for my in tree.get_leaves(who[k]):
+                        if int(my) not in trueintrogressed:
+                            trueintrogressed.append(int(my))
+                else:
+                    if int(who[k]) not in trueintrogressed:
+                        trueintrogressed.append(int(who[k]))
+    
+                        
+            #keep only the modern people that have introgressedsegments       
         trueintrogressedfinal=[x for x in trueintrogressed if x in modernsamples]
     
 
@@ -372,7 +373,7 @@ for j in dd:
             out2.write('\n')
         out2.write('#################################################################################################################################\n')
     
-    #print(len(person_chunks),len(trueintrogressedfinal))
+    print(len(person_chunks),len(trueintrogressedfinal))
     
     
     
