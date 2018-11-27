@@ -213,7 +213,10 @@ chrom=1
 #Output file 1 
 out=open('Info_{}.gen'.format(chrom),'w')
 out2=open('genotypes_{}.gen'.format(chrom),'w')
-out3=open('introgessions_{}.gen'.format(chrom),'w')
+out3=open('Patterns_{}.gen'.format(chrom),'w')
+out4=open('Introgressed_variants_{}.gen'.format(chrom),'w')
+
+
 for j in dd:
     
     introgressed=[]
@@ -300,7 +303,7 @@ for j in dd:
                     except KeyError:
                         person_chunks[ind]=[ tree.interval ]
                     
-        RecombinatingSegments[RC]=INTS
+        RecombinatingSegments[RC]=[INTS,float(tree.interval[0]),float(tree.interval[1]),float(tree.interval[1]-tree.interval[0])]
         RC+=1
     
     
@@ -366,13 +369,28 @@ for j in dd:
         out.write('Person {} has {} chunks of introgretion in him/her \n'.format(chunk,introgressionsum/LENGTH))
     
     out.write('#######################\n')
-    if trueintrogressed!=[]:
+    if trueintrogressedfinal!=[] and len(trueintrogressedfinal)>=3:
         for var in j.variants():
             for indvar in var.genotypes:
                 out2.write(str(indvar))
             out2.write('\n')
         out2.write('#################################################################################################################################\n')
-    
+        
+        for var in j.variants():
+            for R in RecombinatingSegments:
+                #print(RecombinatingSegments[R][1],RecombinatingSegments[R][2],var.site.position)
+                if RecombinatingSegments[R][1]<=float(var.site.position) and float(var.site.position)<=RecombinatingSegments[R][2] and RecombinatingSegments[R][0]>=0:
+                    for variant in var.genotypes:
+                        out4.write(str(variant))
+                    out4.write('\t{}'.format(var.site.position))
+                    out4.write('\n')
+        out4.write('#####################################################################\n')
+        for RC in RecombinatingSegments:
+            out3.write('number of individuals with intr{} begins:{} ends:{} length:{} \n'.format(RecombinatingSegments[RC][0],RecombinatingSegments[RC][1],RecombinatingSegments[RC][2],RecombinatingSegments[RC][3]))
+            
+        
+        out3.write('#####################################################################\n')
+        
     print(len(person_chunks),len(trueintrogressedfinal))
     
     
