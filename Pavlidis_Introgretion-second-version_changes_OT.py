@@ -188,7 +188,7 @@ chrom=1
 #recomb_map=msprime.RecombinationMap.read_hapmap('genetic_map_GRCh37_chr{}.txt'.format(chrom))
 
 #Number of replications, not all reps have an introgression
-n_replicates=10000
+n_replicates=1000
 LENGTH=10e+5
 random_seed=random.randint(0,100000)
 
@@ -208,7 +208,7 @@ dd = msprime.simulate(samples=samples,
     demographic_events=demographic_events,record_migrations=True,random_seed=random_seed,length=LENGTH, recombination_rate=2e-8 ,num_replicates=n_replicates)
 #recombination_map=recomb_map
 
-events=0
+
 chrom=1
 #Output file 1 
 out=open('Info_{}.gen'.format(chrom),'w')
@@ -244,7 +244,6 @@ for j in dd:
                 when.append(str(i.time))         # time of introgretion
             if int(i.node) not in introgressed: #all original introgressed individuals
                 introgressed.append(int(i.node))
-                events+=1
                 #break
     for p in j.variants():
         positions.append([p.position,p.index])
@@ -386,7 +385,7 @@ for j in dd:
                     out4.write('\n')
         out4.write('#####################################################################\n')
         for RC in RecombinatingSegments:
-            out3.write('number of individuals with intr{} begins:{} ends:{} length:{} \n'.format(RecombinatingSegments[RC][0],RecombinatingSegments[RC][1],RecombinatingSegments[RC][2],RecombinatingSegments[RC][3]))
+            out3.write('{} {} {} {} \n'.format(RecombinatingSegments[RC][0],RecombinatingSegments[RC][1],RecombinatingSegments[RC][2],RecombinatingSegments[RC][3]))
             
         
         out3.write('#####################################################################\n')
@@ -397,6 +396,3 @@ for j in dd:
     
     
     
-    
-    
-print(events/n_replicates)
