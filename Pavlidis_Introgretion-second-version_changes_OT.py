@@ -256,6 +256,7 @@ for j in dd:
     RC=0
     for tree in j.trees():
         INTS=0
+        WHO=[]
         #Now we cycle through all recombinating segments of our sequence
         #we can print the tree/history of each sement
         #print(tree.draw(format="unicode"))
@@ -293,6 +294,7 @@ for j in dd:
                 
                 if tree.population(tree.mrca(ind,8))==1 or tree.population(tree.mrca(ind,8))==2:#if it belongs to population 1 or 2 (Neaderthal pops) then its an introgressed seg
                     INTS+=1
+                    WHO.append(int(ind))
                     try:
                         person_introgretions[ind]+=1
                     except KeyError:
@@ -301,8 +303,7 @@ for j in dd:
                         person_chunks[ind].append(tree.interval)
                     except KeyError:
                         person_chunks[ind]=[ tree.interval ]
-                    
-        RecombinatingSegments[RC]=[INTS,float(tree.interval[0]),float(tree.interval[1]),float(tree.interval[1]-tree.interval[0])]
+        RecombinatingSegments[RC]=[INTS,float(tree.interval[0]),float(tree.interval[1]),float(tree.interval[1]-tree.interval[0]),WHO]
         RC+=1
     
     
@@ -378,10 +379,12 @@ for j in dd:
         for var in j.variants():
             for R in RecombinatingSegments:
                 #print(RecombinatingSegments[R][1],RecombinatingSegments[R][2],var.site.position)
-                if RecombinatingSegments[R][1]<=float(var.site.position) and float(var.site.position)<=RecombinatingSegments[R][2] and RecombinatingSegments[R][0]>=0:
+                if RecombinatingSegments[R][1]<=float(var.site.position) and float(var.site.position)<=RecombinatingSegments[R][2] and RecombinatingSegments[R][0]>0:
                     for variant in var.genotypes:
                         out4.write(str(variant))
                     out4.write('\t{}'.format(var.site.position))
+                    out4.write('\t')
+                    out4.write(','.join([str(x) for x in RecombinatingSegments[R][4]]))
                     out4.write('\n')
         out4.write('#####################################################################\n')
         for RC in RecombinatingSegments:
@@ -392,7 +395,4 @@ for j in dd:
         
     print(len(person_chunks),len(trueintrogressedfinal))
     
-    
-    
-    
-    
+  
