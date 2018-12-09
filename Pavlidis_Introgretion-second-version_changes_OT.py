@@ -51,6 +51,9 @@ T_split_EU_ASIA= 23000/generation_time
 
 T_introgration1=50000/generation_time
 T_archaic_sampling=50000/generation_time
+T_archaic_sampling_neand2=120000/generation_time
+T_introgression_btw_neands =121000/generation_time
+
 
 #If we try to use the parameters given in Gravel et al 2011, I would recommend using this time point where European and East Asian populations start growing exponentially.
 T_exp_growth = 5115/generation_time
@@ -101,7 +104,7 @@ migration_matrix = [
     [0,0,0,0.0000077946681,0.000031078741,0]
 ]
 
-samples=[msprime.Sample(0,T_archaic_sampling)]*6 + [msprime.Sample(1,T_archaic_sampling)]*6 + [msprime.Sample(2,T_archaic_sampling)] *6 + [msprime.Sample(3,0)] *6 + [msprime.Sample(4,0)] *6 + [msprime.Sample(5,0)] *6
+samples=[msprime.Sample(0,T_archaic_sampling)]*6 + [msprime.Sample(1,T_archaic_sampling)]*6 + [msprime.Sample(2,T_archaic_sampling_neand2)] *6 + [msprime.Sample(3,0)] *200 + [msprime.Sample(4,0)] *550 + [msprime.Sample(5,0)] *550
 
 
 demographic_events = [
@@ -142,9 +145,8 @@ msprime.MigrationRateChange(time=T_introgration1,rate=0, matrix_index=(1, 4)),
 msprime.MigrationRateChange(time=T_introgration1,rate=0, matrix_index=(4, 1)),
 
 
-
 msprime.MigrationRateChange(time=T_introgration1,rate=0, matrix_index=(1, 4)),
-msprime.MigrationRateChange(time=T_introgration1,rate=0.01, matrix_index=(4, 1)),
+msprime.MigrationRateChange(time=T_introgration1,rate=0.02, matrix_index=(4, 1)),
 
 #End of Introgration
 
@@ -163,6 +165,12 @@ msprime.MassMigration(time=T_split_AFRICA_OUTOFAFRICA,source=4,destination=3,pro
 msprime.MigrationRateChange(time=T_split_AFRICA_OUTOFAFRICA,rate=0),
     
 msprime.PopulationParametersChange(time =T_split_AFRICA_OUTOFAFRICA , initial_size = N_OG_SAPIENS , growth_rate = 0, population_id = 4),
+
+########################################################################################
+#Admixture between 2 neanderthal lineages
+msprime.MassMigration(time=T_introgression_btw_neands,source=2,destination=1,proportion = 0.05),
+msprime.MassMigration(time=T_introgression_btw_neands,source=1,destination=2,proportion = 0.05),
+
 
 ########################################################################################
 #Split of 2 neanderthal lineages
@@ -188,7 +196,7 @@ chrom=1
 #recomb_map=msprime.RecombinationMap.read_hapmap('genetic_map_GRCh37_chr{}.txt'.format(chrom))
 
 #Number of replications, not all reps have an introgression
-n_replicates=1000
+n_replicates=20000
 LENGTH=10e+5
 random_seed=random.randint(0,100000)
 
@@ -229,7 +237,7 @@ for j in dd:
     person_introgretions={}
     person_chunks={}
     modernsamples=[i for i in range(0,j.num_samples)]
-    
+    random_seed=random.randint(0,100000)
 
     
     #Cycle through all migrations that happened
@@ -395,4 +403,7 @@ for j in dd:
         
     print(len(person_chunks),len(trueintrogressedfinal))
     
-  
+    
+    
+    
+    
