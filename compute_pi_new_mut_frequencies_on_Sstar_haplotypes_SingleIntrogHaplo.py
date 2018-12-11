@@ -21,13 +21,13 @@ outf2 = open(output_file2, 'w')
 def get_inds_percDerived_noHaplos(line): #line from the phased haplotypes input file (inf1)
 	print (line[-1].split('\n')[0])
 	if line[-1].split('\n')[0] == '7':
-		individuals = [ str(line[4])]
-		percent_derived_avr = [ str(line[5])]
-		noHaplos = ['1']		
+		individuals =  str(line[4])
+		percent_derived_avr =  str(line[5])
+		noHaplos = '1'		
 	elif line[-1].split('\n')[0] == '9':
-		individuals = [ line[4] + '_' + line[5] ] 
-		percent_derived_avr = [ str( ( float(line[6]) + float(line[7]) )/2.0 ) ]
-		noHaplos = ['2']		
+		individuals =  line[4] + '_' + line[5] 
+		percent_derived_avr =  str( ( float(line[6]) + float(line[7]) )/2.0 ) 
+		noHaplos = '2'		
 	elif int(line[-1].split('\n')[0]) > 9:
 		ind_and_hapl_l = []
 		percent_shared_l = []
@@ -40,8 +40,8 @@ def get_inds_percDerived_noHaplos(line): #line from the phased haplotypes input 
 		for x in line[int(stop_index):-2]:
 			percent_shared_l.append(float(x))				
 		individuals = '_'.join(ind_and_hapl_l) 
-		percent_derived_avr = [ str( sum(percent_shared_l) / float(len(percent_shared_l)) )]
-		noHaplos = [str( len(ind_and_hapl_l) ) ]
+		percent_derived_avr =  str( sum(percent_shared_l) / float(len(percent_shared_l)) )
+		noHaplos = str( len(ind_and_hapl_l) ) 
 		#print percent_derived_avg
 	return individuals, percent_derived_avr, noHaplos
 
