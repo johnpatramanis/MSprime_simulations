@@ -1,3 +1,4 @@
+#########compute pi & new mutation frequencies on Sstar significant haplotypes 
 
 import sys
  
