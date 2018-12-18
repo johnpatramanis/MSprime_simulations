@@ -43,7 +43,7 @@ generation_time = 29.0
 
 T_split_EU_ASIA_sample = np.array(np.random.uniform(low = 36000, high = 55000, size=1))
 #N_OUT_OF_AFRICA_sample = np.array(np.random.randint(low = 5000, high = 15000, size=1))
-T_introgration1_sample = np.array(np.random.uniform(low = T_split_EU_ASIA_sample, high = 65000, size=1))
+T_introgration1_sample = np.array(np.random.uniform(low = T_split_EU_ASIA_sample+501, high = 65000, size=1))
 adm_prop2_N_EA_sample = np.array(np.random.uniform(low = -0.000015, high = 0.00025, size=1))
 T_introgression_btw_neands_sample = np.array(np.random.uniform(low = int(T_introgration1_sample), high = 130000, size=1))
 
@@ -53,14 +53,14 @@ T_split_NEAD1_NEAD2= 130000/generation_time
 T_split_AFRICA_OUTOFAFRICA= 70000/generation_time
 T_split_EU_ASIA= T_split_EU_ASIA_sample/generation_time
 
-T_introgration1=T_introgration1_sample/generation_time
-T_introgration1_end=(T_introgration1_sample+500.0)/generation_time
+T_introgration1=(T_introgration1_sample-500.0)/generation_time
+T_introgration1_end=T_introgration1_sample/generation_time
 
-T_introgration2= (T_split_EU_ASIA_sample+500.0)/generation_time
-T_introgration2_end = (T_split_EU_ASIA_sample+1000.0)/generation_time
+T_introgration2 = (T_split_EU_ASIA_sample-1000.0)/generation_time
+T_introgration2_end= (T_split_EU_ASIA_sample-500.0)/generation_time
 
 T_archaic_sampling=50000/generation_time
-T_archaic_sampling_neand2=50000/generation_time
+T_archaic_sampling_neand2=120000/generation_time
 
 T_introgression_btw_neands=T_introgression_btw_neands_sample/generation_time
 
@@ -83,6 +83,10 @@ N_EASN_atSplit_EU_ASIA = 550
 N_AFR_beforeExpGrowth = 14474
 N_EUR_beforeExpGrowth = 9475
 N_EASN_beforeExpGrowth = 8879
+
+m_eu_ea = 0.000025 * (23000.0/float(T_split_EU_ASIA_sample))
+m_afr_ea = 0.0000078 * (23000.0/float(T_split_EU_ASIA_sample))
+m_afr_eu =  0.0000311 * (23000.0/float(T_split_EU_ASIA_sample))
 
 
 #I would recommend the following: based on the model given in Vernot and Akey 2014 (time at which growth starts taken from Gravel et al 2011)
@@ -108,11 +112,6 @@ population_configurations = [
 m_=0.00001
 #m_T1=131
 
-m_eu_ea = 0.000025 * 23000.0/float(T_split_EU_ASIA_sample)
-m_afr_ea = 0.0000078 * 23000.0/float(T_split_EU_ASIA_sample)
-m_afr_eu =  0.0000311 * 23000.0/float(T_split_EU_ASIA_sample)
-
-
 
 migration_matrix = [
 ####DE,NE1,NE2,AF,EU,AS##
@@ -135,7 +134,25 @@ demographic_events = [
 msprime.PopulationParametersChange(time =T_exp_growth , growth_rate = 0 , population_id = 3),
 
 msprime.PopulationParametersChange(time =T_exp_growth , growth_rate = r_EU_btw_ExpGrowth_EuEasplit , population_id = 4),
-msprime.PopulationParametersChange(time =T_exp_growth ,growth_rate=r_EA_btw_ExpGrowth_EuEasplit , population_id = 5),
+msprime.PopulationParametersChange(time =T_exp_growth ,growth_rate=r_EU_btw_ExpGrowth_EuEasplit , population_id = 5),
+
+########################################################################################
+
+#Second Introgration into EA
+msprime.MigrationRateChange(time=T_introgration2,rate=0, matrix_index=(2, 5)),
+msprime.MigrationRateChange(time=T_introgration2,rate=0, matrix_index=(5, 2)),
+
+
+msprime.MigrationRateChange(time=T_introgration2,rate=0, matrix_index=(2, 5)),
+msprime.MigrationRateChange(time=T_introgration2,rate=adm_prop2_N_EA_sample, matrix_index=(5, 2)),
+
+
+#End of Introgration
+
+msprime.MigrationRateChange(time=T_introgration2_end,rate=0, matrix_index=(2, 5)),
+msprime.MigrationRateChange(time=T_introgration2_end,rate=0, matrix_index=(5, 2)),
+
+
 
 #######################################################################################
 #Split of Eu and Asia ,bottleneck,steady growth 
@@ -157,7 +174,8 @@ msprime.MigrationRateChange(time=T_split_EU_ASIA,rate=0), ##didn't know how to c
 ##does this look correct here? - wanted to set a new migration rate between the ancestors of Eurasians and Africans
 msprime.MigrationRateChange(time=T_split_EU_ASIA,rate=0.0001498975, matrix_index=(4,3)), 
 msprime.MigrationRateChange(time=T_split_EU_ASIA,rate=0.0001498975, matrix_index=(3,4)),
-    
+
+
 ########################################################################################
 
 #Introgration
@@ -168,6 +186,7 @@ msprime.MigrationRateChange(time=T_introgration1,rate=0, matrix_index=(4, 1)),
 msprime.MigrationRateChange(time=T_introgration1,rate=0, matrix_index=(1, 4)),
 msprime.MigrationRateChange(time=T_introgration1,rate=0.00075, matrix_index=(4, 1)),
 
+
 #End of Introgration
 
 msprime.MigrationRateChange(time=T_introgration1_end,rate=0, matrix_index=(1, 4)),
@@ -176,22 +195,6 @@ msprime.MigrationRateChange(time=T_introgration1_end,rate=0, matrix_index=(4, 1)
 
 #msprime.MassMigration(time=T_introgration1,source=1,destination=4,proportion = 0.03),
 ########################################################################################
-
-#Second Introgration into EA
-msprime.MigrationRateChange(time=T_introgration2,rate=0, matrix_index=(2, 5)),
-msprime.MigrationRateChange(time=T_introgration2,rate=0, matrix_index=(5, 2)),
-
-
-msprime.MigrationRateChange(time=T_introgration2,rate=0, matrix_index=(2, 5)),
-msprime.MigrationRateChange(time=T_introgration2,rate=adm_prop2_N_EA_sample, matrix_index=(5, 2)),
-
-#End of Introgration
-
-msprime.MigrationRateChange(time=T_introgration2_end,rate=0, matrix_index=(2, 5)),
-msprime.MigrationRateChange(time=T_introgration2_end,rate=0, matrix_index=(5, 2)),
-
-
-########################################################################################
 #Split Africa-Eurasian, population 3 size set to homo sapiens
 
 msprime.PopulationParametersChange(time =T_split_AFRICA_OUTOFAFRICA , initial_size = N_OUT_OF_AFRICA , growth_rate = 0, population_id = 4),
@@ -199,7 +202,8 @@ msprime.PopulationParametersChange(time =T_split_AFRICA_OUTOFAFRICA , initial_si
 msprime.MassMigration(time=T_split_AFRICA_OUTOFAFRICA,source=4,destination=3,proportion = 1.0),
 msprime.MigrationRateChange(time=T_split_AFRICA_OUTOFAFRICA,rate=0),
     
-msprime.PopulationParametersChange(time =T_split_AFRICA_OUTOFAFRICA , initial_size = N_OG_SAPIENS , growth_rate = 0, population_id = 4),
+msprime.PopulationParametersChange(time =T_split_AFRICA_OUTOFAFRICA , initial_size = N_OG_SAPIENS , growth_rate = 0, population_id = 3),
+
 
 ########################################################################################
 #Admixture between 2 neanderthal lineages
@@ -213,29 +217,45 @@ msprime.MigrationRateChange(time=T_introgression_btw_neands,rate=0, matrix_index
 msprime.MigrationRateChange(time=T_introgression_btw_neands,rate=float(adm_prop_btw_neands)/100.0, matrix_index=(1, 2)),
 msprime.MigrationRateChange(time=T_introgression_btw_neands,rate=float(adm_prop_btw_neands)/100.0, matrix_index=(2, 1)),
 
+
 #End of Introgration
 
 msprime.MigrationRateChange(time=T_introgression_btw_neands+1,rate=0, matrix_index=(1, 2)),
 msprime.MigrationRateChange(time=T_introgression_btw_neands+1,rate=0, matrix_index=(2, 1)),
 
 
+
 ########################################################################################
 #Split of 2 neanderthal lineages
 
 msprime.MassMigration(time=T_split_NEAD1_NEAD2,source=1,destination=2,proportion = 1.0),
+
 ########################################################################################
 #Split of Neanderthal and Denisova, population 0 size set to Neanderthal-Denisova
 
 msprime.MassMigration(time=T_split_NEAD_DENI,source=2,destination=0,proportion = 1.0),
 msprime.PopulationParametersChange(time =T_split_NEAD_DENI , initial_size = N_OG_NEAD_DENI , population_id = 0),
 
+
 ########################################################################################
 #Split of sapiens with archaic
 
 msprime.MassMigration(time=T_split_SAPIENS_NEAD_DENI,source=3,destination=0,proportion = 1.0)
 
-]
 
+]
+print(T_exp_growth)
+print(T_introgration2)
+print(T_introgration2_end)
+print(T_split_EU_ASIA)
+print(T_introgration1)
+print(T_introgration1_end)
+print(T_split_AFRICA_OUTOFAFRICA)
+print(T_introgression_btw_neands)
+print(T_introgression_btw_neands+1)
+print(T_split_NEAD1_NEAD2)
+print(T_split_NEAD_DENI)
+print(T_split_SAPIENS_NEAD_DENI)
 chrom=1
 # I have successfully used the following to load the recombination map of chromosome 1 so the length and recombination rates parameters
 # of the Simulation match chromosome (can be one with the others as well0 but had 'memory error' problems
