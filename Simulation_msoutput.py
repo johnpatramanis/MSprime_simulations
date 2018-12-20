@@ -77,7 +77,8 @@ for RUN in dd:
     MYRUN+=1
     outfile.close()
     
-
+################################## 
+#FLIP GENOTYPES
 MAXRUNS=MYRUN
 MYRUN=1
 while MYRUN<MAXRUNS:
@@ -89,11 +90,29 @@ while MYRUN<MAXRUNS:
         person=[]
         for line in msprimefile:
             line=line.strip().split()[0]
-            #print(line[299])
             person.append(str(line[column]))
-        print(len(person))
         msfile.write(''.join(person))
         msfile.write('\n')
         column+=1
         msprimefile.close()
     MYRUN+=1
+
+#####################################################
+#MERGING OF FILES ####
+##
+REPLICATE=0
+MERGED=open('ms_allchroms_{}'.format(REPLICATE),'w')
+for sample in range(0,len(samples)):
+    
+    for chromosome in range(1,23):
+        file=open('ms_{}'.format(chromosome),'r')
+        myline=0
+        for line in file:
+            if myline==sample:
+                line=line.strip()
+                MERGED.write(str(line))
+                break
+            myline+=1
+        file.close()
+    MERGED.write('\n')
+MERGED.close()
