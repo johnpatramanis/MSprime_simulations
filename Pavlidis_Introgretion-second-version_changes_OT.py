@@ -114,8 +114,8 @@ demographic_events = [
 
 msprime.PopulationParametersChange(time =T_exp_growth , growth_rate = 0 , population_id = 3),
 
-msprime.PopulationParametersChange(time =T_exp_growth , growth_rate = 0.003 , population_id = 4),
-msprime.PopulationParametersChange(time =T_exp_growth ,growth_rate=0.003 , population_id = 5),
+msprime.PopulationParametersChange(time =T_exp_growth , growth_rate = 0.00365 , population_id = 4),
+msprime.PopulationParametersChange(time =T_exp_growth ,growth_rate=0.0045 , population_id = 5),
 
 #######################################################################################
 #Split of Eu and Asia ,bottleneck,steady growth 
